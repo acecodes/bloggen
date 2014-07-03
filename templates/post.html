@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<!-- Header -->
+<div id="header">
+	<h1>Blog post title</h1>
+	<h2>Subtitle</h2>
+	<h3 id="date">date</h3>
+</div>
+
+<!-- Content -->
+<div id="content">
+	{{ post.html|safe }}
+</div>
+
+{% endblock content %}

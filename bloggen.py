@@ -4,6 +4,7 @@ import markdown
 import os
 import yaml
 
+
 POSTS_FILE_EXTENSION = '.md'
 app = Flask(__name__)
 
@@ -28,6 +29,13 @@ class Post(object):
 				content += line
 
 		self.__dict__.update(yaml.load(content))
+
+def format_date(value, format='%B %d, %Y'):
+	return value.strftime(format)
+
+@app.context_processor
+def inject_format_date():
+	return {'format_date':format_date}
 
 @app.route('/')
 def index():

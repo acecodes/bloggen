@@ -10,11 +10,12 @@ app = Flask(__name__)
 class Post(object):
 	def __init__(self, path):
 		self.path = path
+		self._initialize_metadata()
 
 	@cached_property
 	def html(self):
 		with open(self.path, 'r') as file_input:
-			content = file_input.read().strip()
+			content = file_input.read().split('\n\n', 1)[1].strip()
 
 		return markdown.markdown(content)
 

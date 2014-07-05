@@ -8,6 +8,13 @@ import yaml
 POSTS_FILE_EXTENSION = '.md'
 app = Flask(__name__)
 
+class Blog(object):
+	def __init__(self, app, root_dir='', file_ext=POSTS_FILE_EXTENSION):
+		self.root_dir = root_dir
+		self.file_ext = file_ext
+		self.app = app
+		self._cache = {}
+
 class Post(object):
 	def __init__(self, path, root_dir=''):
 		self.urlpath = os.path.splitext(path.strip('/'))[0]

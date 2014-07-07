@@ -119,4 +119,5 @@ def post(path):
 	return render_template('post.html', post=post)
 
 if __name__ == '__main__':
-	app.run(debug=True, port=8000)
+	post_files = [post.filepath for post in blog.posts]
+	app.run(debug=True, port=8000, extra_files=post_files)

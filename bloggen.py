@@ -1,10 +1,12 @@
-from flask import Flask, render_template, url_for, abort
+from flask import Flask, render_template, url_for, abort, request
 from werkzeug import cached_property
+from werkzeug.contrib.atom import AtomFeed
 import markdown
 import os
 import yaml
 import collections
 
+author = "Buzz Killington"
 
 POSTS_FILE_EXTENSION = '.md'
 
@@ -87,9 +89,8 @@ class Post(object):
 
 		return markdown.markdown(content)
 
-	@property
-	def url(self):
-		return url_for('post', path=self.urlpath)
+	def url(self, _external=False):
+		return url_for('post', path=self.urlpath, _external=_external)
 
 	def _initialize_metadata(self):
 		content = ''
@@ -117,6 +118,24 @@ def index():
 def post(path):
 	post = blog.get_post_or_404(path)
 	return render_template('post.html', post=post)
+
+@app.route('/feed.atom')
+def feed():
+	feed = AtomFeed('Recent Articles', feed_url=request.url, url=request.url_root)
+	posts = blog.posts
+	title = lambda p: '%s: %s' % (p.title, p.subtitle) if hasattr(p, 'subtitle') else p.title
+
+	for post in posts:
+	    feed.add(title(post),
+	    	post.html,
+	    	content_type='html',
+	    	author=author,
+	    	url=post.url(_external=True),
+	    	updated=post.date,
+	    	published=post.date)
+
+	return feed.get_response()
+
 
 if __name__ == '__main__':
 	post_files = [post.filepath for post in blog.posts]

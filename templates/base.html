@@ -7,6 +7,13 @@
 
 	<!-- Stylesheets -->
 	<link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+
+	<!-- Atom feed -->
+	<link href="{{ url_for('feed') }}"
+		rel="alternate"
+		title="Recent changes"
+		type="application/atom+xml">
+
 </head>
 <body>
 

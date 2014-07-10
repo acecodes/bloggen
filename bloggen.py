@@ -10,8 +10,11 @@ import collections
 
 author = "Buzz Killington"
 
+# Configuration settings
 POSTS_FILE_EXTENSION = '.md'
+FREEZER_BASE_URL = 'http://testing123.com'
 
+# Custom dictionary class that sorts items by date
 class SortedDict(collections.MutableMapping):
 	def __init__(self, items=None, key=None, reverse=False):
 		self._items = {}
@@ -48,18 +51,21 @@ class SortedDict(collections.MutableMapping):
 	def __repr__(self):
 		return '{0}({1})'.format(self.__class__.__name__, self._items)
 
-
+# Class for handling the blog itself that creates an API for accessing posts
 class Blog(object):
-	def __init__(self, app, root_dir='', file_ext=POSTS_FILE_EXTENSION):
+	def __init__(self, app, root_dir='', file_ext=None):
 		self.root_dir = root_dir
-		self.file_ext = file_ext
+		self.file_ext = file_ext if file_ext is not None else app.config['POSTS_FILE_EXTENSION']
 		self._app = app
 		self._cache = SortedDict(key=lambda p: p.date, reverse=True)
 		self._initialize_cache()
 
 	@property
 	def posts(self):
-		return self._cache.values()
+		if self._app.debug:
+			return self._cache.values()
+		else:
+			return [post for post in self._cache.values() if post.published]
 
 	def get_post_or_404(self, path):
 		"""Returns the post object for the given path or raises a NotFound exception"""
@@ -78,10 +84,12 @@ class Blog(object):
 					post = Post(path, root_dir=self.root_dir)
 					self._cache[post.urlpath] = post
 
+# Class that converts Markdown files into posts
 class Post(object):
 	def __init__(self, path, root_dir=''):
 		self.urlpath = os.path.splitext(path.strip('/'))[0]
 		self.filepath = os.path.join(root_dir, path.strip('/'))
+		self.published = False # Keeps post in draft mode, must be changed in original Markup file in order for post to be published to main feed
 		self._initialize_metadata()
 
 	@cached_property
@@ -104,8 +112,8 @@ class Post(object):
 
 		self.__dict__.update(yaml.load(content))
 
-
 app = Flask(__name__)
+app.config.from_object(__name__)
 blog = Blog(app, root_dir='posts')
 freezer = Freezer(app)
 
@@ -145,4 +153,4 @@ if __name__ == '__main__':
 		freezer.freeze()
 	else:
 		post_files = [post.filepath for post in blog.posts]
-		app.run(debug=True, port=8000, extra_files=post_files)
+		app.run(port=8000, debug=True, extra_files=post_files)

@@ -2,17 +2,20 @@ from flask import Flask, render_template, url_for, abort, request
 from flask.ext.frozen import Freezer
 from werkzeug import cached_property
 from werkzeug.contrib.atom import AtomFeed
+from boto.s3.key import Key
 import sys
 import markdown
 import os
 import yaml
 import collections
+import boto
+import aws_settings
 
-author = "Buzz Killington"
 
 # Configuration settings
 POSTS_FILE_EXTENSION = '.md'
-FREEZER_BASE_URL = 'http://testing123.com'
+FREEZER_BASE_URL = 'http://acebloggen.com' # CHANGE THIS!
+author = "Buzz Killington"
 
 # Custom dictionary class that sorts items by date
 class SortedDict(collections.MutableMapping):
@@ -147,10 +150,25 @@ def feed():
 
 	return feed.get_response()
 
+def deploy(root_dir):
+	conn = boto.connect_s3(aws_settings.AWS_ACCESS_KEY_ID, aws_settings.AWS_SECRET_ACCESS_KEY)
+	bucket = conn.get_bucket(aws_settings.DOMAIN)
+	for (root, dirpaths, filepaths) in os.walk(root_dir):
+		for filepath in filepaths:	
+			filename = os.path.join(root, filepath)
+			name = filename.replace(root_dir, '', 1)[1:]
+			key = Key(bucket, name)
+			key.set_contents_from_filename(filename)
+
+	print('Site is now up on {site}'.format(site=bucket.get_website_endpoint()))
+
 
 if __name__ == '__main__':
 	if len(sys.argv) > 1 and sys.argv[1] == 'build':
 		freezer.freeze()
+	elif len(sys.argv) > 1 and sys.argv[1] == 'deploy':
+		freezer.freeze()
+		deploy('build')
 	else:
 		post_files = [post.filepath for post in blog.posts]
 		app.run(port=8000, debug=True, extra_files=post_files)

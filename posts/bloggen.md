@@ -1,10 +1,8 @@
 title: Bloggen
+subtitle: Create static HTML/CSS blogs with Flask
 date: 2014-07-02
 published: true
 
-## Bloggen
-#### Create static HTML/CSS blogs with Flask
-----------
 
 Hello, this is a sample Markdown file that can act as a guide for how to format blog posts. The <code>title</code>, <code>date</code> and <code>published</code> YAML variables at the top of this file (not visible to anyone viewing the HTML version of this), act just as their names imply. It is important to note that if <code>published</code> is either absent or set to <code>false</code>, then this post will not appear in the main index page.
 

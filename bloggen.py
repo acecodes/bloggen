@@ -14,8 +14,8 @@ import aws_settings
 
 # Configuration settings
 POSTS_FILE_EXTENSION = '.md'
-FREEZER_BASE_URL = 'http://acebloggen.com' # CHANGE THIS!
-author = "Buzz Killington"
+FREEZER_BASE_URL = 'http://testing123.com' # CHANGE THIS!
+author = "Buzz Killington" # CHANGE THIS!
 
 # Custom dictionary class that sorts items by date
 class SortedDict(collections.MutableMapping):

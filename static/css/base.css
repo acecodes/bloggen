@@ -4,7 +4,7 @@ body {
     font-family: verdana, helvetica, sans-serif;
 }
 
-#container { margin: 50px auto 10px auto; }
+#container { margin: auto; }
 
 h1, h2 {
     font-family: Georgia, serif;
